@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+
+<html lang="es">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <title>Sistema de Registro de Visitas</title>
+
+    <style>
+
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 1000px;
+            margin: 40px auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+
+        h1,
+        h2 {
+            text-align: center;
+        }
+
+        .contenedor {
+            background-color: white;
+            padding: 25px;
+            margin-bottom: 30px;
+            border-radius: 8px;
+        }
+
+        form p {
+            display: flex;
+            flex-direction: column;
+        }
+
+        input,
+        textarea {
+            padding: 8px;
+            margin-top: 5px;
+        }
+
+        button {
+            padding: 8px 15px;
+            cursor: pointer;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th,
+        td {
+            border: 1px solid #cccccc;
+            padding: 10px;
+            text-align: left;
+        }
+
+        th {
+            background-color: #eeeeee;
+        }
+
+        .errorlist {
+            color: red;
+        }
+
+    </style>
+
+</head>
+
+
+<body>
+
+
+    <h1>Sistema de Registro de Visitas</h1>
+
+
+    <div class="contenedor">
+
+        <h2>Registrar visita</h2>
+
+
+        <form method="POST">
+
+            {% csrf_token %}
+
+            {{ form.as_p }}
+
+            <button type="submit">
+                Registrar visita
+            </button>
+
+        </form>
+
+    </div>
+
+
+    <div class="contenedor">
+
+        <h2>
+            Visitas del día:
+            {{ fecha_actual|date:"d/m/Y" }}
+        </h2>
+
+
+        <table>
+
+            <thead>
+
+                <tr>
+
+                    <th>Nombre</th>
+
+                    <th>RUT</th>
+
+                    <th>Motivo</th>
+
+                    <th>Entrada</th>
+
+                    <th>Salida</th>
+
+                    <th>Acción</th>
+
+                </tr>
+
+            </thead>
+
+
+            <tbody>
+
+                {% for visita in visitas %}
+
+                    <tr>
+
+                        <td>
+                            {{ visita.nombre }}
+                        </td>
+
+                        <td>
+                            {{ visita.rut }}
+                        </td>
+
+                        <td>
+                            {{ visita.motivo }}
+                        </td>
+
+                        <td>
+                            {{ visita.hora_entrada|date:"H:i:s" }}
+                        </td>
+
+
+                        <td>
+
+                            {% if visita.hora_salida %}
+
+                                {{ visita.hora_salida|date:"H:i:s" }}
+
+                            {% else %}
+
+                                Sin registrar
+
+                            {% endif %}
+
+                        </td>
+
+
+                        <td>
+
+                            {% if not visita.hora_salida %}
+
+                                <form
+                                    method="POST"
+                                    action="{% url 'registrar_salida' visita.id %}"
+                                >
+
+                                    {% csrf_token %}
+
+                                    <button type="submit">
+                                        Registrar salida
+                                    </button>
+
+                                </form>
+
+                            {% else %}
+
+                                Visita finalizada
+
+                            {% endif %}
+
+                        </td>
+
+                    </tr>
+
+
+                {% empty %}
+
+                    <tr>
+
+                        <td colspan="6">
+
+                            No existen visitas registradas hoy.
+
+                        </td>
+
+                    </tr>
+
+                {% endfor %}
+
+            </tbody>
+
+        </table>
+
+    </div>
+
+
+</body>
+
+</html>
