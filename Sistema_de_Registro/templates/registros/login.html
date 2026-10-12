@@ -1,0 +1,7 @@
+{% extends "registros/base.html" %}
+{% block titulo %}Ingresar al sistema{% endblock %}
+{% block contenido %}<section class="contenedor" style="max-width:450px;margin:auto"><h2>Acceso de personal autorizado</h2>
+  {% if form.errors %}<p class="error">{{ form.non_field_errors|striptags }}</p>{% endif %}
+  <form method="post">{% csrf_token %}{{ form.as_p }}<input type="hidden" name="next" value="{{ next }}"><button type="submit">Ingresar</button></form>
+  <p class="ayuda">Se requiere una cuenta del personal (is_staff). Puedes crearla con <code>python manage.py createsuperuser</code>.</p>
+</section>{% endblock %}

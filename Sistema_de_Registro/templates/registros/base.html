@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{% block titulo %}Sistema de Registro de Visitas{% endblock %}</title>
+  <style>
+    *{box-sizing:border-box} body{font-family:Arial,sans-serif;max-width:1150px;margin:30px auto;padding:16px;background:#f5f6f8;color:#212936}
+    h1,h2{margin-top:0} header{display:flex;justify-content:space-between;align-items:center;gap:16px;flex-wrap:wrap;margin-bottom:24px}
+    .contenedor{background:#fff;padding:24px;margin-bottom:22px;border-radius:10px;border:1px solid #e4e6eb}
+    .rejilla{display:grid;grid-template-columns:1fr 1.8fr;gap:22px}
+    form p{display:flex;flex-direction:column;gap:5px}
+    input,textarea,select{padding:9px;border:1px solid #9ca3af;border-radius:6px;max-width:100%;font:inherit}
+    input:not([type=checkbox]){width:100%} label{font-weight:600}
+    button,.boton{background:#1e4874;color:white;padding:9px 12px;cursor:pointer;border:0;border-radius:6px;text-decoration:none;display:inline-block;font:inherit}
+    .boton.secundario{background:#64748b}.boton.peligro{background:#9d3030}
+    .acciones{display:flex;gap:7px;flex-wrap:wrap;align-items:center}.acciones form{margin:0}
+    table{width:100%;border-collapse:collapse} th,td{border-bottom:1px solid #e4e6eb;padding:10px;text-align:left;vertical-align:top}th{background:#f2f4f7}
+    .tabla-scroll{overflow-x:auto}.errorlist,.error{color:#a12828}.ayuda{font-size:.88rem;color:#5d6878}
+    .mensajes{list-style:none;padding:0}.mensajes li{background:#ecf3fc;border-left:4px solid #1e4874;padding:10px;margin:8px 0}
+    .mensajes li.error{background:#fff0f0;border-color:#a12828}.enlaces a{margin:0 4px}.paginacion{display:flex;gap:10px;align-items:center;margin-top:20px}
+    @media(max-width:780px){.rejilla{grid-template-columns:1fr}.contenedor{padding:15px}}
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Sistema de Registro de Visitas</h1>
+    {% if user.is_authenticated %}
+      <div class="acciones"><a class="boton secundario" href="{% url 'registro' %}">Inicio</a><a class="boton secundario" href="{% url 'admin:index' %}">Django Admin</a>
+      <form method="post" action="{% url 'logout' %}">{% csrf_token %}<button type="submit">Cerrar sesión</button></form></div>
+    {% endif %}
+  </header>
+  {% if messages %}<ul class="mensajes">{% for message in messages %}<li class="{{ message.tags }}">{{ message }}</li>{% endfor %}</ul>{% endif %}
+  {% block contenido %}{% endblock %}
+</body>
+</html>

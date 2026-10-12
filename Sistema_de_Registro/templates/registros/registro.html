@@ -1,223 +1,49 @@
-<!DOCTYPE html>
-
-<html lang="es">
-
-<head>
-
-    <meta charset="UTF-8">
-
-    <meta name="viewport"
-          content="width=device-width, initial-scale=1.0">
-
-    <title>Sistema de Registro de Visitas</title>
-
-    <style>
-
-        body {
-            font-family: Arial, sans-serif;
-            max-width: 1000px;
-            margin: 40px auto;
-            padding: 20px;
-            background-color: #f5f5f5;
-        }
-
-        h1,
-        h2 {
-            text-align: center;
-        }
-
-        .contenedor {
-            background-color: white;
-            padding: 25px;
-            margin-bottom: 30px;
-            border-radius: 8px;
-        }
-
-        form p {
-            display: flex;
-            flex-direction: column;
-        }
-
-        input,
-        textarea {
-            padding: 8px;
-            margin-top: 5px;
-        }
-
-        button {
-            padding: 8px 15px;
-            cursor: pointer;
-        }
-
-        table {
-            width: 100%;
-            border-collapse: collapse;
-        }
-
-        th,
-        td {
-            border: 1px solid #cccccc;
-            padding: 10px;
-            text-align: left;
-        }
-
-        th {
-            background-color: #eeeeee;
-        }
-
-        .errorlist {
-            color: red;
-        }
-
-    </style>
-
-</head>
-
-
-<body>
-
-
-    <h1>Sistema de Registro de Visitas</h1>
-
-
-    <div class="contenedor">
-
-        <h2>Registrar visita</h2>
-
-
-        <form method="POST">
-
-            {% csrf_token %}
-
-            {{ form.as_p }}
-
-            <button type="submit">
-                Registrar visita
-            </button>
-
-        </form>
-
-    </div>
-
-
-    <div class="contenedor">
-
-        <h2>
-            Visitas del día:
-            {{ fecha_actual|date:"d/m/Y" }}
-        </h2>
-
-
-        <table>
-
-            <thead>
-
-                <tr>
-
-                    <th>Nombre</th>
-
-                    <th>RUT</th>
-
-                    <th>Motivo</th>
-
-                    <th>Entrada</th>
-
-                    <th>Salida</th>
-
-                    <th>Acción</th>
-
-                </tr>
-
-            </thead>
-
-
-            <tbody>
-
-                {% for visita in visitas %}
-
-                    <tr>
-
-                        <td>
-                            {{ visita.nombre }}
-                        </td>
-
-                        <td>
-                            {{ visita.rut }}
-                        </td>
-
-                        <td>
-                            {{ visita.motivo }}
-                        </td>
-
-                        <td>
-                            {{ visita.hora_entrada|date:"H:i:s" }}
-                        </td>
-
-
-                        <td>
-
-                            {% if visita.hora_salida %}
-
-                                {{ visita.hora_salida|date:"H:i:s" }}
-
-                            {% else %}
-
-                                Sin registrar
-
-                            {% endif %}
-
-                        </td>
-
-
-                        <td>
-
-                            {% if not visita.hora_salida %}
-
-                                <form
-                                    method="POST"
-                                    action="{% url 'registrar_salida' visita.id %}"
-                                >
-
-                                    {% csrf_token %}
-
-                                    <button type="submit">
-                                        Registrar salida
-                                    </button>
-
-                                </form>
-
-                            {% else %}
-
-                                Visita finalizada
-
-                            {% endif %}
-
-                        </td>
-
-                    </tr>
-
-
-                {% empty %}
-
-                    <tr>
-
-                        <td colspan="6">
-
-                            No existen visitas registradas hoy.
-
-                        </td>
-
-                    </tr>
-
-                {% endfor %}
-
-            </tbody>
-
-        </table>
-
-    </div>
-
-
-</body>
-
-</html>
+{% extends "registros/base.html" %}
+{% block contenido %}
+<div class="rejilla">
+  <section class="contenedor">
+    <h2>Registrar visita</h2>
+    <p class="ayuda">La fecha y la hora se ingresan manualmente. No se asignará la hora actual de forma automática.</p>
+    <form method="post">{% csrf_token %}{{ form.as_p }}<button type="submit">Registrar visita</button></form>
+  </section>
+  <section class="contenedor">
+    <h2>Historial de visitas</h2>
+    <form method="get" class="acciones" style="margin-bottom:16px">
+      <label>Fecha de entrada <input type="date" name="fecha" value="{{ fecha_filtro }}"></label>
+      <label>Estado <select name="estado"><option value="">Todas</option><option value="abierta" {% if estado_filtro == 'abierta' %}selected{% endif %}>Sin salida</option><option value="finalizada" {% if estado_filtro == 'finalizada' %}selected{% endif %}>Finalizadas</option></select></label>
+      <button type="submit">Filtrar</button><a class="boton secundario" href="{% url 'registro' %}">Limpiar</a>
+    </form>
+    <div class="tabla-scroll"><table>
+      <thead><tr><th>Nombre</th><th>RUT</th><th>Motivo</th><th>Entrada</th><th>Salida</th><th>Acciones</th></tr></thead>
+      <tbody>
+      {% for visita in pagina %}
+        <tr>
+          <td>{{ visita.nombre }}</td><td>{{ visita.rut }}</td><td>{{ visita.motivo }}</td>
+          <td>{{ visita.hora_entrada|date:"d/m/Y H:i" }}</td>
+          <td>{% if visita.hora_salida %}{{ visita.hora_salida|date:"d/m/Y H:i" }}{% else %}Sin registrar{% endif %}</td>
+          <td>
+            <div class="acciones">
+              <a class="boton secundario" href="{% url 'editar_visita' visita.id %}">Editar</a>
+              <a class="boton peligro" href="{% url 'eliminar_visita' visita.id %}">Eliminar</a>
+              {% if not visita.hora_salida %}
+                <form method="post" action="{% url 'registrar_salida' visita.id %}">
+                  {% csrf_token %}
+                  <label class="ayuda" for="salida-{{ visita.id }}">Salida manual</label>
+                  <input id="salida-{{ visita.id }}" type="datetime-local" name="hora_salida" required>
+                  <button type="submit">Registrar salida</button>
+                </form>
+              {% endif %}
+            </div>
+          </td>
+        </tr>
+      {% empty %}<tr><td colspan="6">No hay visitas para los filtros seleccionados.</td></tr>{% endfor %}
+      </tbody>
+    </table></div>
+    <nav class="paginacion" aria-label="Páginas">
+      {% if pagina.has_previous %}<a href="?fecha={{ fecha_filtro|urlencode }}&estado={{ estado_filtro|urlencode }}&pagina={{ pagina.previous_page_number }}">Anterior</a>{% endif %}
+      <span>Página {{ pagina.number }} de {{ pagina.paginator.num_pages }}</span>
+      {% if pagina.has_next %}<a href="?fecha={{ fecha_filtro|urlencode }}&estado={{ estado_filtro|urlencode }}&pagina={{ pagina.next_page_number }}">Siguiente</a>{% endif %}
+    </nav>
+  </section>
+</div>
+{% endblock %}
