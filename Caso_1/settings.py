@@ -12,7 +12,7 @@ db_database = os.getenv("database")
 db_user = os.getenv("user")
 db_password = os.getenv("password")
 
-DEBUG = os.getenv("DJANGO_DEBUG", "true").lower() in ("1", "true", "yes", "on")
+DEBUG = os.getenv("DJANGO_DEBUG", "False").lower() == "true"
 
 SECRET_KEY = os.getenv("DJANGO_SECRET_KEY","")
 if not SECRET_KEY:
@@ -24,7 +24,8 @@ if not SECRET_KEY:
 ALLOWED_HOSTS = [
     'ev-2-back-end-caso-1.vercel.app',
     'localhost',
-    '127.0.0.1'
+    '127.0.0.1',
+    '.vercel.app',
 ]
 
 CSRF_TRUSTED_ORIGINS = [h.strip() for h in os.getenv("DJANGO_CSRF_TRUSTED_ORIGINS", "").split(",") if h.strip()]
