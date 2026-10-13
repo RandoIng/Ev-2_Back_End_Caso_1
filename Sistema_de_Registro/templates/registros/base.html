@@ -26,8 +26,12 @@
   <header>
     <h1>Sistema de Registro de Visitas</h1>
     {% if user.is_authenticated %}
-      <div class="acciones"><a class="boton secundario" href="{% url 'registro' %}">Inicio</a><a class="boton secundario" href="{% url 'admin:index' %}">Django Admin</a>
-      <form method="post" action="{% url 'logout' %}">{% csrf_token %}<button type="submit">Cerrar sesión</button></form></div>
+      <div class="acciones">
+       <form method="post" action="{% url 'logout' %}">
+          {% csrf_token %}
+          <button type="submit">Cerrar sesión</button>
+        </form>
+      </div>
     {% endif %}
   </header>
   {% if messages %}<ul class="mensajes">{% for message in messages %}<li class="{{ message.tags }}">{{ message }}</li>{% endfor %}</ul>{% endif %}
