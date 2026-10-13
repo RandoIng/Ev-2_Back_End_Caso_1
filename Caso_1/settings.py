@@ -14,7 +14,7 @@ db_password = os.getenv("password")
 
 DEBUG = os.getenv("DJANGO_DEBUG", "true").lower() in ("1", "true", "yes", "on")
 
-SECRET_KEY = os.getenv("DJANGO_SECRET_KEY")
+SECRET_KEY = os.getenv("DJANGO_SECRET_KEY","")
 if not SECRET_KEY:
     if DEBUG:
         SECRET_KEY = "clave-solo-para-desarrollo-local-no-usar-en-produccion"
