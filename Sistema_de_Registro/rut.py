@@ -1,9 +1,7 @@
 import re
 from django.core.exceptions import ValidationError
 
-# Validación de FORMATO exclusivamente. No se calcula el módulo 11.
-# Se acepta un cuerpo de 1 a 8 dígitos y un carácter final 0-9 o K/k.
-# Ejemplos: 14.850.808-0, 14850808-9, 14850808K.
+
 PATRON_SIN_PUNTOS = re.compile(r"^[0-9]{1,8}-?[0-9K]$")
 PATRON_CON_PUNTOS = re.compile(r"^[0-9]{1,2}(?:\.[0-9]{3}){1,2}-[0-9K]$")
 
