@@ -12,7 +12,7 @@ db_database = os.getenv("database")
 db_user = os.getenv("user")
 db_password = os.getenv("password")
 
-DEBUG = os.getenv("DJANGO_DEBUG", "False").lower() == "true"
+DEBUG = os.getenv("DJANGO_DEBUG", "true").lower() in ("1", "true", "yes", "on")
 
 SECRET_KEY = os.getenv("DJANGO_SECRET_KEY")
 if not SECRET_KEY:
